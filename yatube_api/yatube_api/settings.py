@@ -1,5 +1,8 @@
 import os
 
+from datetime import timedelta
+
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = 'hhz7l-ltdismtf@bzyz+rple7*s*w$jak%whj@(@u0eok^f9k4'
@@ -17,6 +20,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'api',
+    'djoser',
     'posts',
 ]
 
@@ -88,6 +92,38 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAuthenticated', 
     ],
+
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle',
+        # Не будем подключать класс AnonRateThrottle глобально.
+        # Подключим его только в тех view-классах или вьюсетах,
+        # где надо установить лимиты для анонимов
+        'rest_framework.throttling.ScopedRateThrottle',
+    ],
+    
+    'DEFAULT_THROTTLE_RATES': {
+        # Но сами лимиты установим, и они будут доступны из всего кода проекта
+        'user': '10000/day', #  Лимит для UserRateThrottle
+        'anon': '1000/day',  #  Лимит для AnonRateThrottle
+        # Имена (ключи) для scope придумывает разработчик, 
+        # в меру собственной фантазии
+        'low_request': '1/minute',
+    },
+
+    'DEFAULT_PAGINATION_CLASS': 
+        'rest_framework.pagination.PageNumberPagination',
+        'PAGE_SIZE': 5,
 }
+
+
+SIMPLE_JWT = {
+    # Устанавливаем срок жизни токена
+   'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+   'AUTH_HEADER_TYPES': ('Bearer',),
+} 
