@@ -38,8 +38,25 @@ class Comment(models.Model):
     created = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True)
 
+    def __str__(self):
+        return '"{}" to post "{}" by author "{}"'.format(self.text,
+                                                         self.post,
+                                                         self.author)
+
+
+
+
 class Follow(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='follower')
+        User, on_delete=models.CASCADE, null=True, blank=True, related_name='follower')
     following = models.ForeignKey(
-        Post, on_delete=models.CASCADE, related_name='following')
+        Post, on_delete=models.CASCADE, null=True, blank=True, related_name='following')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user', 'following'],
+                                    name='unique_follow'),
+        ]
+
+    def __str__(self):
+        return '{} follows {}'.format(self.user, self.following)

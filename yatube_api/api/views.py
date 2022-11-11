@@ -8,12 +8,7 @@ from rest_framework.throttling import ScopedRateThrottle
 from posts.models import Group, Post, User
 from .serializers import GroupSerializer, PostSerializer, CommentSerializer, FollowSerializer
 from .permissions import IsAuthorOrReadOnlyPermission
-
-
-class GroupViewSet(viewsets.ReadOnlyModelViewSet):
-    """ViewSet группы."""
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
+from rest_framework.response import Response
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -47,7 +42,14 @@ class CommentViewSet(viewsets.ModelViewSet):
         return post
 
 
-
+class GroupViewSet(viewsets.ReadOnlyModelViewSet):
+    """ViewSet группы."""
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+    permission_classes = [IsAuthorOrReadOnlyPermission]
+    
+    def create(self, request):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
 
