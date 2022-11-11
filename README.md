@@ -54,3 +54,5 @@ python manage.py runserver
     "password": "pswrd123!"
 }
 ```
+#### 3) GET-запрос на http://127.0.0.1:8000/api/v1/posts/ для получения всех постов.
+#### 4) GET-запрос на http://127.0.0.1:8000/api/v1/posts/{id}/ для получения поста с указанным id.
