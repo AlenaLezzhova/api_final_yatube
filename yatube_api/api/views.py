@@ -6,7 +6,9 @@ from rest_framework import filters, viewsets
 from rest_framework.pagination import LimitOffsetPagination
 
 from posts.models import Group, Post, User
-from .serializers import GroupSerializer, PostSerializer, CommentSerializer, FollowSerializer
+from .serializers import (
+    GroupSerializer, PostSerializer,
+    CommentSerializer, FollowSerializer)
 from .permissions import IsAuthorOrReadOnlyPermission
 
 
@@ -41,7 +43,7 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [IsAuthorOrReadOnlyPermission]
-    
+
 
 class FollowViewSet(viewsets.ModelViewSet):
     serializer_class = FollowSerializer
