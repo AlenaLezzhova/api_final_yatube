@@ -12,6 +12,7 @@ class Group(models.Model):
     def __str__(self):
         return self.title
 
+
 class Post(models.Model):
     text = models.TextField()
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
@@ -38,13 +39,6 @@ class Comment(models.Model):
     created = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True)
 
-    def __str__(self):
-        return '"{}" to post "{}" by author "{}"'.format(self.text,
-                                                         self.post,
-                                                         self.author)
-
-
-
 
 class Follow(models.Model):
     user = models.ForeignKey(
@@ -57,6 +51,3 @@ class Follow(models.Model):
             models.UniqueConstraint(fields=['user', 'following'],
                                     name='unique_follow'),
         ]
-
-    def __str__(self):
-        return '{} follows {}'.format(self.user, self.following)

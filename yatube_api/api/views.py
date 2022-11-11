@@ -2,13 +2,12 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework import permissions
 from rest_framework import viewsets
-from rest_framework import filters, permissions, status, viewsets
-from rest_framework.throttling import ScopedRateThrottle
+from rest_framework import filters, viewsets
+from rest_framework.pagination import LimitOffsetPagination
 
 from posts.models import Group, Post, User
 from .serializers import GroupSerializer, PostSerializer, CommentSerializer, FollowSerializer
 from .permissions import IsAuthorOrReadOnlyPermission
-from rest_framework.response import Response
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -16,7 +15,8 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [
-        permissions.IsAuthenticated, IsAuthorOrReadOnlyPermission]
+        permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnlyPermission]
+    pagination_class = LimitOffsetPagination
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -25,12 +25,7 @@ class PostViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     """ViewSet комментария."""
     serializer_class = CommentSerializer
-    permission_classes = [
-        permissions.IsAuthenticated, IsAuthorOrReadOnlyPermission]
-    throttle_classes = ScopedRateThrottle
-    # А далее применится лимит low_request
-    # Для любых пользователей установим кастомный лимит 1 запрос в минуту
-    throttle_scope = 'low_request' 
+    permission_classes = [IsAuthorOrReadOnlyPermission]
 
     def get_queryset(self):
         post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
@@ -39,7 +34,6 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
         serializer.save(author=self.request.user, post=post)
-        return post
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
@@ -48,15 +42,8 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = GroupSerializer
     permission_classes = [IsAuthorOrReadOnlyPermission]
     
-    def create(self, request):
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-
-
-
-
 
 class FollowViewSet(viewsets.ModelViewSet):
-    # http_method_names = ['get', 'post']
     serializer_class = FollowSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
@@ -65,7 +52,6 @@ class FollowViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = get_object_or_404(User, username=self.request.user.username)
         return user.follower
-
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
