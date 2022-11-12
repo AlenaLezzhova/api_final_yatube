@@ -14,6 +14,7 @@ from .permissions import IsAuthorOrReadOnlyPermission
 
 class PostViewSet(viewsets.ModelViewSet):
     """ViewSet поста."""
+
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [
@@ -26,6 +27,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     """ViewSet комментария."""
+
     serializer_class = CommentSerializer
     permission_classes = [IsAuthorOrReadOnlyPermission]
 
@@ -40,6 +42,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet группы."""
+
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = [IsAuthorOrReadOnlyPermission]
